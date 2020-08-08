@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <script src="https://cdn.tiny.cloud/1/68q0dazjfp8bqmx2icsvn1b2t56oevbjq2nkna1dap3zzvnd/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+
+    <script>
+      tinymce.init({
+        selector: '#mytextarea',
+        height: "600",
+        menubar: "file edit format help",
+              plugins: "advlist lists autolink link autosave code preview searchreplace wordcount media table emoticons image imagetools",
+        toolbar: "bold italic underline | alignleft alignright aligncenter alignjustify | bulletlist numlist outdent indent | link media image | forecolour backcolor emoticons | code preview searchreplace ",
+        
+        // menubar: 'file edit view help'
+        
+        
+      });
+
+      function pastedata(){     
+        if (`<%-data%>`==''){    
+          tinymce.get("mytextarea").setContent(`<p>Please add the text below </p>`)
+        }
+        else{
+         tinymce.get("mytextarea").setContent(`<%-data%>`);
+        }
+
+
+
+      }
+     
+    </script>
+    
+
+  </head>
+
+  <body onload="pastedata()";>
+    <div class="ui center justified container" style="margin-top: 30px;" >
+
+    <div class="ui raised very padded text segment">
+      <!-- <div class="ui raised very padded text container segment"></div> -->
+      <h2 class="ui header">PLEASE ADD A DOWNLOADABLE <strong>LINK</strong> MATERIAL</h2>
+      <form method="POST" action="/apidownload" class="ui form" id="myform">
+        <div class="field">
+          <label style="color: #36688D;">E-mail</label>
+          <input type="email" placeholder="joe@schmoe.com">
+        </div>
+        <div class="field">
+          <label style="color: #36688D;">Password</label>
+          <input type="password">
+        </div>
+          <div class="field">
+            <label style="color: #36688D;">Download  Name</label>
+            <input type="text" name="first-name" value="<%= name %>" placeholder="First Name">
+          </div>
+          <div class="field">
+            <label style="color: #36688D;">Date </label>
+            <input type="text" name="last-name" value="<%=date %> " placeholder="Last Name">
+          </div>
+          <div class="field">
+              <label style="color: #36688D;">Blog</label>
+              <textarea id="mytextarea"> </textarea>
+  
+          </div>
+          <div class="field">
+            <div class="ui checkbox">
+              <input type="checkbox" tabindex="0" class="hidden">
+              <label>I agree to the Terms and Conditions</label>
+            </div>
+          </div>
+          <div id="messages" class="ui hidden brown message">
+            <p id="msg">Post submitted successfully.Please wait redirecting  </p>
+          </div>
+          <button class="ui button" type="submit">Submit</button>
+          
+
+         
+        </form>
+        <a style="margin-top: 20px;" href="/">
+          <button class="ui yellow button">Back to Main page </button>
+        </a>
+    </div>
+  </div>
+
+
+
+
+  </body >
+  <script>
+       const myform=document.getElementById("myform")
+    myform.addEventListener("submit",function(e){
+        e.preventDefault()
+        const formdata= new FormData(this);
+        // console.log(formdata)
+        var x = document.getElementById("myform")
+        var emailid= x.elements[0].value
+        var password= x.elements[1].value
+        console.log(emailid);
+        console.log(password);
+        let edit= `<%=edit%>`
+        let id=`<%=id%>` 
+        var blogname=x.elements[2].value;
+        var date = x.elements[3].value;
+        var bloghtml=tinyMCE.get("mytextarea").getContent()
+        // var x = document.getElementById("myform").elements[0].value; 
+                  //  console.log(tinyMCE.get("mytextarea").getContent())
+        //console.log(x.elements[2].value);
+
+          var person ={
+              email:emailid,
+              pass:password,
+              name:blogname,
+              date:date,
+              data:bloghtml,
+              edit: edit,
+              id:id
+
+           }
+           const options= {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          
+          // body: JSON.stringify(delta)
+          // body:bc.kick
+          body:JSON.stringify(person)
+        }
+        fetch("/apidownload",options)
+       .then(function(response){
+        //  console.log(response)
+         if (response.status==200){
+          document.getElementById("messages").classList.remove('hidden');
+         document.getElementById("messages").classList.add('visible');
+        
+
+         }
+         else{
+          document.getElementById("msg").innerHTML="LECTURE MATERIAL UNABLE TO ADD PLEASE TRY AGAIN LATER"
+          document.getElementById("messages").classList.remove('hidden');
+         document.getElementById("messages").classList.add('visible');
+         }
+       }).catch(function(error){
+        //  console.log(error);
+       })
+      })
+
+  </script>
+</html>
